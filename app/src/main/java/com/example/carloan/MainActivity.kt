@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -51,19 +52,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
+// -------------------------------------------------------------------
 @Composable
 fun CarLoanScreen(modifier: Modifier = Modifier) {
     var loanNum by remember { mutableStateOf("") }
+    var downPayment by remember { mutableStateOf("") }
     var interestRate by remember { mutableFloatStateOf(0.00f) }
 
     Column(
-        modifier = modifier
+        verticalArrangement = Arrangement.SpaceEvenly,
+        modifier = modifier.padding(10.dp)
     ) {
         Text(
             text = "Car Loan Calculator",
-            fontSize = 20.sp
+            fontSize = 25.sp,
+            modifier = modifier.padding( 10.dp )
         )
+// -------------------------------------------------------------------
+// ---------------------*---- CAR PURCHASE FIELD ----*----------------
         TextField(
             value = loanNum,
             singleLine = true,
@@ -78,11 +84,30 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             },
             modifier = Modifier.padding(bottom = 16.dp)
         )
+// -------------------------------------------------------------------
+// ---------------------*---- DOWN PAYMENT FIELD ----*----------------
+        TextField(
+            value = downPayment,
+            singleLine = true,
+            label = {
+                Text(text = "Down Payment Amount: ")
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            onValueChange = {
+                downPayment = it
+            },
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
         RadioGroup(
-            radioOptions = listOf(10, 20, 30)
+            radioOptions = listOf(10, 15, 20, 30),
         )
         InterestSlider( interestVal = interestRate, onChange = { interestRate = it } )
+// -----------------------------------------------------------------
+//      ----------------*---- CALCULATE BUTTON ----*----------------
         Button(
+//          Here is where to do the calculations
             onClick = {},
             modifier = modifier
         ) {
@@ -91,10 +116,11 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
     }
 }
 
-// -----------------------------------------
-// Slider to adjust the annual interest rate
+// -----------------------------------------------------------
+// ----------------*---- SLIDER FUNCTION ----*----------------
 @Composable
 fun InterestSlider(interestVal: Float, onChange: (Float)->Unit) {
+    // Slider to adjust the annual interest rate
     Slider(
         value = interestVal,
         onValueChange = {
@@ -107,21 +133,27 @@ fun InterestSlider(interestVal: Float, onChange: (Float)->Unit) {
         text = interestVal.toInt().toString(),
         textAlign = TextAlign.Center,
         fontSize = 20.sp,
+        color = Color.Black,
         modifier = Modifier.fillMaxWidth()
     )
 }
 
-// -----------------------------------------
-// Gives a list of radio buttons
+// ----------------------------------------------------------------
+// ----------------*---- RADIO GROUP FUNCTION ----*----------------
 @Composable
 fun RadioGroup(radioOptions: List<Int>){
     // mutableIntStateOf
-    var selectedOption by remember { mutableIntStateOf(10) }
+    var selectedOption by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
     ) {
-        Text( text = "Length of the Loan in Years")
+        Text(
+            text = "Length of the Loan in Years",
+            fontSize = 25.sp,
+            modifier = Modifier.padding(10.dp )
+        )
+        // Gives a list of radio buttons
         radioOptions.forEach{ option ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -138,11 +170,16 @@ fun RadioGroup(radioOptions: List<Int>){
                     onClick = null,
                     modifier = Modifier.padding(end = 8.dp)
                 )
+                Text(
+                    text = option.toString()
+                )
             }
         }
     }
 }
 
+// ----------------------------------------------------------------------
+// ----------------*---- PREVIEW FUNCTION (OPTIONAL) ----*----------------
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
