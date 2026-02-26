@@ -5,6 +5,7 @@ import android.widget.RadioGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.TextField
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
@@ -29,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.carloan.ui.theme.CarLoanTheme
+import kotlin.math.pow
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,9 +59,12 @@ class MainActivity : ComponentActivity() {
 // -------------------------------------------------------------------
 @Composable
 fun CarLoanScreen(modifier: Modifier = Modifier) {
-    var loanNum by remember { mutableStateOf("") }
+    var purchasePrice by remember { mutableStateOf("") }
     var downPayment by remember { mutableStateOf("") }
-    var interestRate by remember { mutableFloatStateOf(0.00f) }
+
+    var interest by remember { mutableFloatStateOf(5.0f) }
+    var loanAmount by remember { mutableIntStateOf(0) }
+    var paymentTotal by remember { mutableDoubleStateOf(0.0) }
 
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
@@ -66,21 +73,24 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
         Text(
             text = "Car Loan Calculator",
             fontSize = 25.sp,
-            modifier = modifier.padding( 10.dp )
+            modifier = modifier.padding(  10.dp )
+        )
+        Image(
+            painter = painterResource(id = R.drawable.car)
         )
 // -------------------------------------------------------------------
 // ---------------------*---- CAR PURCHASE FIELD ----*----------------
         TextField(
-            value = loanNum,
+            value = purchasePrice,
             singleLine = true,
             label = {
-                Text(text = "Car Purchase Price: ")
+                Text( text = "Car Purchase Price: ")
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
             onValueChange = {
-                loanNum = it
+                purchasePrice = it
             },
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -90,7 +100,7 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             value = downPayment,
             singleLine = true,
             label = {
-                Text(text = "Down Payment Amount: ")
+                Text( text = "Down Payment Amount: ")
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
@@ -103,23 +113,45 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
         RadioGroup(
             radioOptions = listOf(10, 15, 20, 30),
         )
-        InterestSlider( interestVal = interestRate, onChange = { interestRate = it } )
+        AnnualInterestSlider( interestVal = interest, onChange = { interest = it } )
+        Text(
+            text = String.format("Monthly Payment: %.2f", paymentTotal)
+        )
 // -----------------------------------------------------------------
-//      ----------------*---- CALCULATE BUTTON ----*----------------
+// ---------------------*---- CALCULATE BUTTON ----*----------------
         Button(
-//          Here is where to do the calculations
-            onClick = {},
+            onClick = {
+                paymentTotal = loanTotal(
+                    downPayment = downPayment.toDouble(),
+                    loanLength  = loanAmount,
+                    annualInterest = interest,
+                    purchasePrice = purchasePrice.toDouble()
+                )
+//                paymentAmount = downPayment.toDouble() * loanAmount / (1 - (1 + interest).pow(loanAmount))
+//                tax = paymentAmount * 0.06
+            },
             modifier = modifier
         ) {
-            Text("Calculate")
+            Text( text = "Calculate: ")
         }
     }
 }
 
-// -----------------------------------------------------------
-// ----------------*---- SLIDER FUNCTION ----*----------------
+// ------------------------------------------------------------------
+// ----------------*---- INTEREST RATE FUNCTION ----*----------------
+fun loanTotal(annualInterest: Float, downPayment: Double, purchasePrice: Double, loanLength: Int): Double {
+//    Change both totalInterest and totalLoanAmount to a float
+    val totalInterest = annualInterest / 12
+    val totalLoanAmount = purchasePrice - downPayment
+    val total = totalInterest * totalLoanAmount / (1 - (1 + totalInterest).pow(-loanLength))
+
+    return total
+}
+
+// --------------------------------------------------------------------------------
+// ----------------*---- ANNUAL INTEREST RATE SLIDER FUNCTION ----*----------------
 @Composable
-fun InterestSlider(interestVal: Float, onChange: (Float)->Unit) {
+fun AnnualInterestSlider(interestVal: Float, onChange: (Float)->Unit) {
     // Slider to adjust the annual interest rate
     Slider(
         value = interestVal,
