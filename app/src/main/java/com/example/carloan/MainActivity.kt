@@ -95,7 +95,7 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             onValueChange = {
                 purchasePrice = it
             },
-            modifier = Modifier.padding(bottom = 16.dp, top = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp, top = 5.dp)
         )
 // -------------------------------------------------------------------
 // ---------------------*---- DOWN PAYMENT FIELD ----*----------------
@@ -111,14 +111,18 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             onValueChange = {
                 downPayment = it
             },
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(end = 20.dp)
         )
         RadioGroup(
             radioOptions = listOf(10, 15, 20, 30),
         )
-        AnnualInterestSlider( interestVal = interest, onChange = { interest = it } )
+        AnnualInterestSlider(
+            interestVal = interest,
+            onChange = { interest = it }
+        )
         Text(
-            text = String.format("Monthly Payment: %.2f", paymentTotal)
+            text = String.format("Monthly Payment: %.2f", paymentTotal),
+            modifier = Modifier.padding(top = 12.dp)
         )
 // -----------------------------------------------------------------
 // ---------------------*---- CALCULATE BUTTON ----*----------------
@@ -133,7 +137,7 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             },
             modifier = modifier
         ) {
-            Text( text = "Calculate: ")
+            Text( text = "Calculate" )
         }
     }
 }
