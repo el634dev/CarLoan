@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -73,11 +74,12 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
         Text(
             text = "Car Loan Calculator",
             fontSize = 25.sp,
-            modifier = modifier.padding(  10.dp )
+            modifier = modifier.padding( end = 10.dp)
         )
         Image(
             painter = painterResource(id = R.drawable.car_25),
-            contentDescription = "SUV with desert in the background"
+            contentDescription = "SUV with desert in the background",
+            modifier = Modifier.size(200.dp, 200.dp)
         )
 // -------------------------------------------------------------------
 // ---------------------*---- CAR PURCHASE FIELD ----*----------------
@@ -128,8 +130,6 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
                     annualInterest = interest,
                     purchasePrice = purchasePrice.toDouble()
                 )
-//                paymentAmount = downPayment.toDouble() * loanAmount / (1 - (1 + interest).pow(loanAmount))
-//                tax = paymentAmount * 0.06
             },
             modifier = modifier
         ) {
@@ -141,7 +141,6 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
 // ------------------------------------------------------------------
 // ----------------*---- INTEREST RATE FUNCTION ----*----------------
 fun loanTotal(annualInterest: Float, downPayment: Double, purchasePrice: Double, loanLength: Int): Double {
-//    Change both totalInterest and totalLoanAmount to a float
     val totalLoanAmount = purchasePrice - downPayment
     val monthlyInterest = (annualInterest / 100) / 12
     val totalPayments = loanLength * 12
@@ -182,7 +181,6 @@ fun AnnualInterestSlider(interestVal: Float, onChange: (Float)->Unit) {
 // ----------------*---- RADIO GROUP FUNCTION ----*----------------
 @Composable
 fun RadioGroup(radioOptions: List<Int>){
-    // mutableIntStateOf
     var selectedOption by remember { mutableIntStateOf(0) }
 
     Column(
