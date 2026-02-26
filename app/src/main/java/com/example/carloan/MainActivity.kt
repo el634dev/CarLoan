@@ -76,7 +76,8 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             modifier = modifier.padding(  10.dp )
         )
         Image(
-            painter = painterResource(id = R.drawable.car)
+            painter = painterResource(id = R.drawable.car_25),
+            contentDescription = "SUV with desert in the background"
         )
 // -------------------------------------------------------------------
 // ---------------------*---- CAR PURCHASE FIELD ----*----------------
@@ -92,7 +93,7 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             onValueChange = {
                 purchasePrice = it
             },
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp, top = 16.dp)
         )
 // -------------------------------------------------------------------
 // ---------------------*---- DOWN PAYMENT FIELD ----*----------------
