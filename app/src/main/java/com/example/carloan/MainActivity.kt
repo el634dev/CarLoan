@@ -63,12 +63,12 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
     var downPayment by remember { mutableStateOf("") }
 
     var interest by remember { mutableFloatStateOf(5.0f) }
-    var loanAmount by remember { mutableIntStateOf(0) }
+    var loanAmount by remember { mutableIntStateOf(10) }
     var paymentTotal by remember { mutableDoubleStateOf(0.0) }
 
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
-        modifier = modifier.padding(10.dp)
+        modifier = Modifier.padding(start = 10.dp)
     ) {
         Text(
             text = "Car Loan Calculator",
@@ -142,11 +142,18 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
 // ----------------*---- INTEREST RATE FUNCTION ----*----------------
 fun loanTotal(annualInterest: Float, downPayment: Double, purchasePrice: Double, loanLength: Int): Double {
 //    Change both totalInterest and totalLoanAmount to a float
-    val totalInterest = annualInterest / 12
     val totalLoanAmount = purchasePrice - downPayment
-    val total = totalInterest * totalLoanAmount / (1 - (1 + totalInterest).pow(-loanLength))
+    val monthlyInterest = (annualInterest / 100) / 12
+    val totalPayments = loanLength * 12
 
-    return total
+    if (monthlyInterest == 0f) {
+        return totalLoanAmount / totalPayments
+    }
+
+    val numerator = monthlyInterest * (1 + monthlyInterest).pow(totalPayments)
+    val denominator = (1 + monthlyInterest).pow(totalPayments) - 1
+
+    return totalLoanAmount * numerator / denominator
 }
 
 // --------------------------------------------------------------------------------
