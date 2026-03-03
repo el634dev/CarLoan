@@ -1,5 +1,6 @@
 package com.example.carloan
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.RadioGroup
 import androidx.activity.ComponentActivity
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,9 +59,21 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-// -------------------------------------------------------------------
+// ------------------------------------------------------------------------
+// ----------------*---- CAR LOAN SCREEN FUNCTION ----*-------------------
 @Composable
 fun CarLoanScreen(modifier: Modifier = Modifier) {
+    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        CarLoanPortrait(modifier)
+    } else {
+        CarLoanLandscape(modifier)
+    }
+}
+
+// ---------------------------------------------------------------------------------
+// ----------------*---- CAR LOAN PORTRAIT ORIENTATION FUNCTION ----*----------------
+@Composable
+fun CarLoanPortrait(modifier: Modifier) {
     var purchasePrice by remember { mutableStateOf("") }
     var downPayment by remember { mutableStateOf("") }
 
@@ -113,6 +127,7 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             },
             modifier = Modifier.padding(end = 20.dp)
         )
+//        ----------------------------------------------
         RadioGroup(
             radioOptions = listOf(10, 15, 20, 30),
         )
@@ -124,8 +139,8 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
             text = String.format("Monthly Payment: %.2f", paymentTotal),
             modifier = Modifier.padding(top = 12.dp)
         )
-// -----------------------------------------------------------------
-// ---------------------*---- CALCULATE BUTTON ----*----------------
+    // -----------------------------------------------------------------
+    // ---------------------*---- CALCULATE BUTTON ----*----------------
         Button(
             onClick = {
                 paymentTotal = loanTotal(
@@ -139,6 +154,104 @@ fun CarLoanScreen(modifier: Modifier = Modifier) {
         ) {
             Text( text = "Calculate" )
         }
+    }
+}
+
+// ------------------------------------------------------------------
+// ----------------*---- CAR LOAN LANDSCAPE FUNCTION ----*----------------
+@Composable
+fun CarLoanLandscape(modifier: Modifier) {
+    var purchasePrice by remember { mutableStateOf("") }
+    var downPayment by remember { mutableStateOf("") }
+
+    var interest by remember { mutableFloatStateOf(5.0f) }
+    var loanAmount by remember { mutableIntStateOf(10) }
+    var paymentTotal by remember { mutableDoubleStateOf(0.0) }
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = modifier.fillMaxSize()
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.padding(start = 10.dp)
+        ) {
+            Text(
+                text = "Car Loan Calculator",
+                fontSize = 25.sp,
+            )
+            Image(
+                painter = painterResource(id = R.drawable.car_25),
+                contentDescription = "SUV with desert in the background",
+                modifier = Modifier.size(100.dp, 100.dp)
+            )
+            // -------------------------------------------------------------------
+            // ---------------------*---- CAR PURCHASE FIELD ----*----------------
+            TextField(
+                value = purchasePrice,
+                singleLine = true,
+                label = {
+                    Text( text = "Car Purchase Price: ")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                onValueChange = {
+                    purchasePrice = it
+                },
+                modifier = Modifier.padding(bottom = 16.dp, top = 5.dp)
+            )
+        // -------------------------------------------------------------------
+        // ---------------------*---- DOWN PAYMENT FIELD ----*----------------
+            TextField(
+                value = downPayment,
+                singleLine = true,
+                label = {
+                    Text( text = "Down Payment Amount: ")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ),
+                onValueChange = {
+                    downPayment = it
+                },
+                modifier = Modifier.padding(end = 20.dp)
+            )
+            Text(
+                text = String.format("Monthly Payment: %.2f", paymentTotal),
+                modifier = Modifier.padding(top = 10.dp)
+            )
+        }
+       Row(
+
+       ) {
+           Column(
+
+           ) {
+               RadioGroup(
+                   radioOptions = listOf(10, 15, 20, 30)
+               )
+               AnnualInterestSlider(
+                   interestVal = interest,
+                   onChange = { interest = it }
+               )
+               // -----------------------------------------------------------------
+               // ---------------------*---- CALCULATE BUTTON ----*----------------
+               Button(
+                   onClick = {
+                       paymentTotal = loanTotal(
+                           downPayment = downPayment.toDouble(),
+                           loanLength  = loanAmount,
+                           annualInterest = interest,
+                           purchasePrice = purchasePrice.toDouble()
+                       )
+                   },
+                   modifier = modifier
+               ) {
+                   Text( text = "Calculate" )
+               }
+           }
+       }
     }
 }
 
@@ -226,6 +339,6 @@ fun RadioGroup(radioOptions: List<Int>){
 @Composable
 fun GreetingPreview() {
     CarLoanTheme {
-       CarLoanScreen()
+        CarLoanScreen()
     }
 }
