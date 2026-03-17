@@ -174,16 +174,11 @@ fun CarLoanLandscape(modifier: Modifier) {
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.padding(start = 10.dp)
+            modifier = Modifier.padding(start = 14.dp)
         ) {
             Text(
                 text = "Car Loan Calculator",
                 fontSize = 25.sp,
-            )
-            Image(
-                painter = painterResource(id = R.drawable.car_25),
-                contentDescription = "SUV with desert in the background",
-                modifier = Modifier.size(100.dp, 100.dp)
             )
             // -------------------------------------------------------------------
             // ---------------------*---- CAR PURCHASE FIELD ----*----------------
@@ -215,12 +210,27 @@ fun CarLoanLandscape(modifier: Modifier) {
                 onValueChange = {
                     downPayment = it
                 },
-                modifier = Modifier.padding(end = 20.dp)
+                modifier = Modifier.padding(bottom = 20.dp, start = 12.dp)
             )
             Text(
                 text = String.format("Monthly Payment: %.2f", paymentTotal),
                 modifier = Modifier.padding(top = 10.dp)
             )
+            // -----------------------------------------------------------------
+            // ---------------------*---- CALCULATE BUTTON ----*----------------
+            Button(
+                onClick = {
+                    paymentTotal = loanTotal(
+                        downPayment = downPayment.toDouble(),
+                        loanLength  = loanAmount,
+                        annualInterest = interest,
+                        purchasePrice = purchasePrice.toDouble()
+                    )
+                },
+                modifier = modifier
+            ) {
+                Text( text = "Calculate" )
+            }
         }
        Row(
 
@@ -235,21 +245,6 @@ fun CarLoanLandscape(modifier: Modifier) {
                    interestVal = interest,
                    onChange = { interest = it }
                )
-               // -----------------------------------------------------------------
-               // ---------------------*---- CALCULATE BUTTON ----*----------------
-               Button(
-                   onClick = {
-                       paymentTotal = loanTotal(
-                           downPayment = downPayment.toDouble(),
-                           loanLength  = loanAmount,
-                           annualInterest = interest,
-                           purchasePrice = purchasePrice.toDouble()
-                       )
-                   },
-                   modifier = modifier
-               ) {
-                   Text( text = "Calculate" )
-               }
            }
        }
     }
