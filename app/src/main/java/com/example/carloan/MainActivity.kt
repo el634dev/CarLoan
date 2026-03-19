@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.carloan.ui.theme.CarLoanTheme
 import kotlin.math.pow
 
@@ -62,25 +63,18 @@ class MainActivity : ComponentActivity() {
 // ------------------------------------------------------------------------
 // ----------------*---- CAR LOAN SCREEN FUNCTION ----*-------------------
 @Composable
-fun CarLoanScreen(modifier: Modifier = Modifier) {
+fun CarLoanScreen(modifier: Modifier = Modifier, carLoanView: CarLoanView = viewModel()) {
     if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-        CarLoanPortrait(modifier)
+        CarLoanPortrait(modifier, carLoanView)
     } else {
-        CarLoanLandscape(modifier)
+        CarLoanLandscape(modifier, carLoanView)
     }
 }
 
 // ---------------------------------------------------------------------------------
 // ----------------*---- CAR LOAN PORTRAIT ORIENTATION FUNCTION ----*----------------
 @Composable
-fun CarLoanPortrait(modifier: Modifier) {
-    var purchasePrice by remember { mutableStateOf("") }
-    var downPayment by remember { mutableStateOf("") }
-
-    var interest by remember { mutableFloatStateOf(5.0f) }
-    var loanAmount by remember { mutableIntStateOf(10) }
-    var paymentTotal by remember { mutableDoubleStateOf(0.0) }
-
+fun CarLoanPortrait(modifier: Modifier, carLoanView: CarLoanView) {
     Column(
         verticalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.padding(start = 10.dp)
@@ -98,7 +92,7 @@ fun CarLoanPortrait(modifier: Modifier) {
 // -------------------------------------------------------------------
 // ---------------------*---- CAR PURCHASE FIELD ----*----------------
         TextField(
-            value = purchasePrice,
+            value = carLoanView.purchasePrice,
             singleLine = true,
             label = {
                 Text( text = "Car Purchase Price: ")
@@ -107,14 +101,14 @@ fun CarLoanPortrait(modifier: Modifier) {
                 keyboardType = KeyboardType.Number
             ),
             onValueChange = {
-                purchasePrice = it
+                carLoanView.purchasePrice = it
             },
             modifier = Modifier.padding(bottom = 16.dp, top = 5.dp)
         )
 // -------------------------------------------------------------------
 // ---------------------*---- DOWN PAYMENT FIELD ----*----------------
         TextField(
-            value = downPayment,
+            value = carLoanView.downPayment,
             singleLine = true,
             label = {
                 Text( text = "Down Payment Amount: ")
@@ -123,7 +117,7 @@ fun CarLoanPortrait(modifier: Modifier) {
                 keyboardType = KeyboardType.Number
             ),
             onValueChange = {
-                downPayment = it
+                carLoanView.downPayment = it
             },
             modifier = Modifier.padding(end = 20.dp)
         )
@@ -132,22 +126,22 @@ fun CarLoanPortrait(modifier: Modifier) {
             radioOptions = listOf(10, 15, 20, 30),
         )
         AnnualInterestSlider(
-            interestVal = interest,
-            onChange = { interest = it }
+            interestVal = carLoanView.interest,
+            onChange = { carLoanView.interest = it }
         )
         Text(
-            text = String.format("Monthly Payment: %.2f", paymentTotal),
+            text = String.format("Monthly Payment: %.2f", carLoanView.paymentTotal),
             modifier = Modifier.padding(top = 12.dp)
         )
     // -----------------------------------------------------------------
     // ---------------------*---- CALCULATE BUTTON ----*----------------
         Button(
             onClick = {
-                paymentTotal = loanTotal(
-                    downPayment = downPayment.toDouble(),
-                    loanLength  = loanAmount,
-                    annualInterest = interest,
-                    purchasePrice = purchasePrice.toDouble()
+                carLoanView.paymentTotal = loanTotal(
+                    downPayment = carLoanView.downPayment.toDouble(),
+                    loanLength  = carLoanView.loanAmount,
+                    annualInterest = carLoanView.interest,
+                    purchasePrice = carLoanView.purchasePrice.toDouble()
                 )
             },
             modifier = modifier
@@ -160,14 +154,7 @@ fun CarLoanPortrait(modifier: Modifier) {
 // ------------------------------------------------------------------
 // ----------------*---- CAR LOAN LANDSCAPE FUNCTION ----*----------------
 @Composable
-fun CarLoanLandscape(modifier: Modifier) {
-    var purchasePrice by remember { mutableStateOf("") }
-    var downPayment by remember { mutableStateOf("") }
-
-    var interest by remember { mutableFloatStateOf(5.0f) }
-    var loanAmount by remember { mutableIntStateOf(10) }
-    var paymentTotal by remember { mutableDoubleStateOf(0.0) }
-
+fun CarLoanLandscape(modifier: Modifier, carLoanView: CarLoanView) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = modifier.fillMaxSize()
@@ -183,7 +170,7 @@ fun CarLoanLandscape(modifier: Modifier) {
             // -------------------------------------------------------------------
             // ---------------------*---- CAR PURCHASE FIELD ----*----------------
             TextField(
-                value = purchasePrice,
+                value = carLoanView.purchasePrice,
                 singleLine = true,
                 label = {
                     Text( text = "Car Purchase Price: ")
@@ -192,14 +179,14 @@ fun CarLoanLandscape(modifier: Modifier) {
                     keyboardType = KeyboardType.Number
                 ),
                 onValueChange = {
-                    purchasePrice = it
+                    carLoanView.purchasePrice = it
                 },
                 modifier = Modifier.padding(bottom = 16.dp, top = 5.dp)
             )
         // -------------------------------------------------------------------
         // ---------------------*---- DOWN PAYMENT FIELD ----*----------------
             TextField(
-                value = downPayment,
+                value = carLoanView.downPayment,
                 singleLine = true,
                 label = {
                     Text( text = "Down Payment Amount: ")
@@ -208,23 +195,23 @@ fun CarLoanLandscape(modifier: Modifier) {
                     keyboardType = KeyboardType.Number
                 ),
                 onValueChange = {
-                    downPayment = it
+                    carLoanView.downPayment = it
                 },
                 modifier = Modifier.padding(bottom = 20.dp, start = 12.dp)
             )
             Text(
-                text = String.format("Monthly Payment: %.2f", paymentTotal),
+                text = String.format("Monthly Payment: %.2f", carLoanView.paymentTotal),
                 modifier = Modifier.padding(top = 10.dp)
             )
             // -----------------------------------------------------------------
             // ---------------------*---- CALCULATE BUTTON ----*----------------
             Button(
                 onClick = {
-                    paymentTotal = loanTotal(
-                        downPayment = downPayment.toDouble(),
-                        loanLength  = loanAmount,
-                        annualInterest = interest,
-                        purchasePrice = purchasePrice.toDouble()
+                    carLoanView.paymentTotal = loanTotal(
+                        downPayment = carLoanView.downPayment.toDouble(),
+                        loanLength  = carLoanView.loanAmount,
+                        annualInterest = carLoanView.interest,
+                        purchasePrice = carLoanView.purchasePrice.toDouble()
                     )
                 },
                 modifier = modifier
@@ -242,8 +229,8 @@ fun CarLoanLandscape(modifier: Modifier) {
                    radioOptions = listOf(10, 15, 20, 30)
                )
                AnnualInterestSlider(
-                   interestVal = interest,
-                   onChange = { interest = it }
+                   interestVal = carLoanView.interest,
+                   onChange = { carLoanView.interest = it }
                )
            }
        }
